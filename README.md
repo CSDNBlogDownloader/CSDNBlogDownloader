@@ -45,4 +45,4 @@ User 继承了SwingWorker类，复写SwingWorker的方法，定义User的工作�
 2. crawl() 使用crawlCategory() 和crawlBlog() 方法依次爬取所有文章分类下的文章。
    * crawlBlog() 使用BlogCrawler爬取文章内容。
    * crawlCategory() 使用CategoryCrawler 爬取分类下的文章链接。
-3. createIndex()
+3. createIndex() 创建索引，包括博客信息，文章分类和文章链接。
