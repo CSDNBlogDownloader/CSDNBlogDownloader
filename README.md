@@ -5,6 +5,7 @@ CSDN Blog Downloader CSDN博客下载器
 ## 软件使用说明：
 输入用户名，指定下载到本地的地址，点击下载即可。
 配置中可以保存当前的用户名和下载地址，保存为config.ini文件。读取用户配置则可以读取config.ini文件，填充用户名和下载地址。
+
 ## 目录说明
    * src————源码
    * doc————javadoc文档
@@ -12,7 +13,8 @@ CSDN Blog Downloader CSDN博客下载器
    * jar————jar包
    * .setting————eclipse工程文件
    * .classpath————eclipse工程文件
-## 软件架构：
+
+## 软件架构
 1. Crawler 爬虫用于爬取网页内容，按工作内容不同分为三种：
    * IndexCrawler 首页爬虫用于爬取用户博客首页内容，包括博客的基本信息（访问、积分、排名、原创、转载、译文和评论）、用户头像和文章分类。
    * CategoryCrawler 分类爬虫用于爬取一个文章分类下的所有文章链接。
@@ -36,8 +38,9 @@ IndexCrawlerr 首页爬虫在获得网页内容后，首先使用Parser的blogge
 CategoryCrawler 分类爬虫根据文章分类网页爬取该类下的文章链接，如果网页内容含有关键字”下一页“则自动爬取下一页的内容。文章链接使用键值对存储，key是文章标题，value是文章链接。
 
 BlogCrawler 博客爬虫得到网页内容，调用Parser的fileNameValify方法将文章标题合法化（可以作为文件名），然后使用docParser方法删减掉网页中不需要的内容，接着使用imageParser获取网页中的图片地址，并使用Util中的downloadImage方法将图片下载到本地。然后更新网页中的一些链接，并将图片链接指向本地地址，最后将网页输出为文件。
+
 ### User类
-User 继承了SwingWorker类，复写SwingWorker的方法，定义User的工作流程：
+User 继承了SwingWorker类，复写SwingWorker的方法，定义User的工作流程。
 1. profile() 使用IndexCrawler爬取用户博客首页，得到博客信息、用户头像和文章分类信息。
 2. crawl() 使用crawlCategory() 和crawlBlog() 方法依次爬取所有文章分类下的文章。
     * crawlBlog() 使用BlogCrawler爬取文章内容。
