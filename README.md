@@ -52,5 +52,10 @@ doInBackground() 复写SwingWorker的方法，定义User的工作流程：
    * crawl()  
    * createIndex()
 
+### GUI类
+GUI实现了PropertyChangeListener接口，并通过User的addPropertyChangeListener方法注册给User作为Observer。
+
+User通过firePropertyChange来告知GUI其状态的变化，GUI通过propertyChange来获取变化信息，并改变显示。
+
 ### 作者
 Geurney geurneyma@gmail.com
