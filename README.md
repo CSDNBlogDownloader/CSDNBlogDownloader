@@ -40,9 +40,9 @@ CategoryCrawler 分类爬虫根据文章分类网页爬取该类下的文章链�
 BlogCrawler 博客爬虫得到网页内容，调用Parser的fileNameValify方法将文章标题合法化（可以作为文件名），然后使用docParser方法删减掉网页中不需要的内容，接着使用imageParser获取网页中的图片地址，并使用Util中的downloadImage方法将图片下载到本地。然后更新网页中的一些链接，并将图片链接指向本地地址，最后将网页输出为文件。
 
 ### User类
-User 继承了SwingWorker类，复写SwingWorker的方法，定义User的工作流程.
+User 继承了SwingWorker类，复写SwingWorker的方法，定义User的工作流程:
 1. profile() 使用IndexCrawler爬取用户博客首页，得到博客信息、用户头像和文章分类信息。
 2. crawl() 使用crawlCategory() 和crawlBlog() 方法依次爬取所有文章分类下的文章。
-     * crawlBlog() 使用BlogCrawler爬取文章内容。
-     * crawlCategory() 使用CategoryCrawler 爬取分类下的文章链接。
+   * crawlBlog() 使用BlogCrawler爬取文章内容。
+   * crawlCategory() 使用CategoryCrawler 爬取分类下的文章链接。
 3. createIndex() 创建索引，包括博客信息，文章分类和文章链接。
