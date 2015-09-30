@@ -53,4 +53,4 @@ doInBackground() 复写SwingWorker的方法，定义User的工作流程：
    * createIndex()
 
 ### 作者
-Geurney
+Geurney geurneyma@gmail.com
