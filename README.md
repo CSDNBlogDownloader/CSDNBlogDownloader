@@ -14,7 +14,7 @@ CSDN Blog Downloader CSDN博客下载器
    * .classpath————eclipse工程文件
 ## 软件架构：
 1. Crawler 爬虫用于爬取网页内容，按工作内容不同分为三种：
-   * IndexCrawler 首页爬虫用于爬取用户博客首页（http://blog.csdn.net/geurney）内容，包括博客的基本信息（访问、积分、排名、原创、转载、译文和评论）、用户头像和文章分类。
+   * IndexCrawler 首页爬虫用于爬取用户博客首页内容，包括博客的基本信息（访问、积分、排名、原创、转载、译文和评论）、用户头像和文章分类。
    * CategoryCrawler 分类爬虫用于爬取一个文章分类下的所有文章链接。
    * BlogCrawler 博客爬虫用于爬取一篇文章的内容和图片，并保存到文件。
 2. User是用户类，用于控制爬取用户博客的流程。User 继承了SwingWorker类，使得下载过程可以在后台Work Thread运行，而不会导致GUI界面锁住。
