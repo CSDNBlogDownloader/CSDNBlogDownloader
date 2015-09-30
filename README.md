@@ -48,9 +48,9 @@ User 提供了以下方法:
    * createIndex() 创建索引，包括博客信息，文章分类和文章链接。
  
 doInBackground() 复写SwingWorker的方法，定义User的工作流程：
-1. profile() 
-2. crawl()  
-3. createIndex()
+   * profile() 
+   * crawl()  
+   * createIndex()
 
 ### 作者
 Geurney
