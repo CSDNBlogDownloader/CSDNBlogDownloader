@@ -2,8 +2,11 @@
 CSDN Blog Downloader CSDN博客下载器
 ## Version 2.0
 ![Version2.0](http://img.blog.csdn.net/20151003134648472?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+SHA256:c3fe282f2bb546b4daba38e64edab610966c193045ee70dea60420baa0b8a322
 ## Version 1.0
 ![Version1.0](http://img.blog.csdn.net/20151001001614155?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+SHA256:91043a527f2bb639eb2e9a17b608e54ff98c2f20e0ba926799735f48f2a0b8b6
+
 
 ## 软件使用说明：
 ### Version 2.0
@@ -16,7 +19,8 @@ CSDN Blog Downloader CSDN博客下载器
 ## 目录说明
    * src————源码
    * doc————javadoc文档
-   * exe————可执行文件
+   * exe————可程序执行文件
+   * release————zip文件，含可执行程序文件
    * jar————jar包
    * test————测试文件
    * .setting————eclipse工程文件
