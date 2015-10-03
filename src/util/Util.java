@@ -60,7 +60,7 @@ public abstract class Util {
 			out.close();
 			in.close();
 		} catch (IOException e) {
-			System.out.println("错误：下载失败！"  + folderName + "  " + imageUrl);
+			System.out.println("错误：图片下载失败！"  + folderName + "  " + imageUrl);
 			return false;
 		}
 		return true;
@@ -105,7 +105,7 @@ public abstract class Util {
 		BufferedReader reader = new BufferedReader(new FileReader(filePath));
 		String line;
 		while((line = reader.readLine()) != null) {
-			sb.append(line);
+			sb.append(line + "\n");
 		}
 		int buffer;
 		while((buffer = reader.read()) != -1) {
@@ -113,6 +113,19 @@ public abstract class Util {
 		}
 		reader.close();
 		return sb.toString();
+	}
+
+	/**
+	 * 写入文件
+	 * @param folder 待写入文件目录
+	 * @param fileName 待写入文件名
+	 * @param content 待写入内容
+	 * @return True 写入成功。False 写入失败 
+	 */
+	public static boolean writeToFile(String folder, String fileName, String content) {
+		new File(folder).mkdirs();
+		String filePath = folder + "\\" + fileName;
+		return writeToFile(filePath, content);
 	}
 	
 	/**

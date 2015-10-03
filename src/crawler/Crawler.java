@@ -1,7 +1,8 @@
 package crawler;
 
 import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -23,14 +24,20 @@ public abstract class Crawler {
 	protected Document document;
 	
 	/**
-	 * 爬取url链接
-	 * @param link 链接标题和链接地址
-	 * @return True 爬取成功。False 爬取失败
+	 * 爬虫错误日志
 	 */
-	public abstract boolean crawl(SimpleEntry<String, String> link);
+	protected List<String> errorLog = new ArrayList<String>();
+	
+	/**
+	 * 爬取url链接
+	 * @param url 链接地址
+	 * @param path 保存地址
+	 * @return Blog/Category. Return null if failed.
+	 */
+	public abstract Object crawl(String url, String path);
 
 	/**
-	 * 建立连接。最多尝试20次，重试间隔100ms。
+	 * 建立连接。最多尝试10次，重试间隔100ms。
 	 * @param url url地址
 	 * @return True 连接成功。False 连接失败
 	 */
@@ -45,14 +52,24 @@ public abstract class Crawler {
 				}
 			} catch (IOException e1) {}
 
-			if (trytime++ == 20) {
+			if (trytime++ == 10) {
+				errorLog.add("链接建立失败：" + url);
 				return false;
 			}
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 			}
+			System.out.println("第" + trytime+ "次尝试连接:" + url);
 		}
 		return true;
+	}
+	
+	/**
+	 * 获取错误日志
+	 * @return 错误日志
+	 */
+	public List<String> getErrorLog() {
+		return errorLog;
 	}
 }

@@ -1,11 +1,14 @@
 package crawler;
 
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import parser.Parser;
+import type.Blog;
+import type.Category;
 
 /**
  * 分类爬虫。爬取一个分类下的所有文章链接。 
@@ -13,44 +16,36 @@ import org.jsoup.select.Elements;
  *
  */
 public class CategoryCrawler extends Crawler {
-	/**
-	 * 文章链接。键值对：标题和url地址。
-	 */
-	private List<SimpleEntry<String, String>> links;
-	
-	/**
-	 * 构造分类爬虫
-	 */
-	public CategoryCrawler() {
-		links = new ArrayList<SimpleEntry<String, String>>();
-	}
 
 	@Override
-	public boolean crawl(SimpleEntry<String, String> link) {
+	public Category crawl(String url, String path) {
 		int index = 1;
-		String url = link.getValue();
+		Category category = new Category();
+		category.setUrl(url);
 		while(connect(url + "/" + index)) {
-			// Elements linksOnPage = html.select("a[href][title=\"阅读次数\"]");
+			if (category.getTitle() == null) {
+				String[] titles = document.select("title").first().text().split("-");  //[title]是attribute，title是tag
+				String title = titles[titles.length - 4].trim();  // maybe better in parser?
+				category.setTitle(title);
+				category.setPath(path + "\\" + Parser.fileNameValify(title));
+			}
+			
 			Elements pagelinks = document.select(".link_title a[href]");
 			for (Element pagelink : pagelinks) {
-				links.add(new SimpleEntry<String, String>(pagelink.text(),
-						pagelink.absUrl("href")));
+				Blog blog = new Blog();
+				blog.setUrl(pagelink.absUrl("href"));
+				List<String> list = new ArrayList<String>();
+				list.add(category.getTitle());
+				blog.setCategory(list);
+				category.getBlogs().add(blog);
 			}
 			if (document.text().contains("下一页")) {
 				index++;
 			} else {
-				return true;
+				return category;
 			}
 		}
-		return false;
+		return null;
 	}
-
-	/**
-	 * 获取文章链接
-	 * @return 文章链接
-	 */
-	public List<SimpleEntry<String, String>> links() {
-		return links;
-	}
-
+	
 }

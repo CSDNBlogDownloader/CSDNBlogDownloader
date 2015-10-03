@@ -1,67 +1,54 @@
 package crawler;
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.List;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import parser.Parser;
+import type.Blog;
 import util.Util;
+
 /**
  * 文章爬虫。爬取文章内容。
  * @author Geurney
  *
  */
 public class BlogCrawler extends Crawler {
-	/**
-	 * 文章保存目录
-	 */
-	private String root;
-	
-	/**
-	 * 文章标题
-	 */
-	private String title;
-	
-	/**
-	 * 构造文章爬虫
-	 * @param root 文章保存目录
-	 */
-	public BlogCrawler(String root) {
-		this.root = root;
-	}
 
 	@Override
-	public boolean crawl(SimpleEntry<String, String> link) {
-		if (connect(link.getValue())) {
-			String html = document.html();
-			title = Parser.fileNameValify(link.getKey());
-			html = Parser.docParser(html);
-			String blogPath = root + "\\" + title + ".html";
-			List<String> images = Parser.imageParser(html);
-			String imagePath = root + "\\" + title;
-			for (int i = 0; i < images.size(); i++) {
-				Util.downloadImage(images.get(i), imagePath, (i+1) + "");
+	public Blog crawl(String url, String blogFolder) {
+		if (connect(url)) {
+			Blog blog = new Blog();
+			blog.setUrl(url);
+			
+			String title = document.select(".link_title").first().text();
+			blog.setTitle(title);
+			title = Parser.fileNameValify(title);
+			
+			blog.setPath(blogFolder + "\\" + title +".html");
+			
+			Elements categories = document.select(".link_categories a[href]");
+			for (Element category : categories) {
+				blog.getCategory().add(category.text());
 			}
+			
+			String imageFolder = blogFolder + "\\" + title;
+			Elements images = document.select(".article_content img[src]");
+			for (int i = 0; i < images.size(); i++) {
+				if (!Util.downloadImage(images.get(i).absUrl("src"), imageFolder, (i + 1) + "")) {
+					errorLog.add("图片下载失败: " + title + ": " + images.get(i));
+				}
+			}
+			
+			String html = Parser.docParser(document.html());
 			html = Parser.imageLocalize(html, title);
 			html = Parser.updateLinks(html);
-			return Util.writeToFile(blogPath, html);
+			
+			if (!Util.writeToFile(blogFolder, title +".html", html)) {
+				errorLog.add("文章保存失败：" + blog.getPath());
+			}
+			return blog;
 		}
-		return false;
-	}
-
-	/**
-	 * 获取文章保存路径
-	 * @return 文章保存路径
-	 */
-	public String blogPath() {
-		return root + "\\" + title + ".html";
+		return null;
 	}
 	
-	/**
-	 * 获取文章标题
-	 * @return 文章标题
-	 */
-	public String title() {
-		return title;
-	}
-
 }

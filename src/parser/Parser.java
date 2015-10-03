@@ -11,6 +11,74 @@ import java.util.regex.Pattern;
  *
  */
 public class Parser {
+
+	/**
+	 * 文章标题剖析器
+	 * @param html 待剖析的分类标题
+	 * @param valifyName 是否合法化分类名
+	 * @return 文章标题
+	 */
+	 public static String blogTitleParser(String html, boolean valifyName) {
+		 String title = null;
+		 Pattern pattern = Pattern.compile("<title>(.*?) -"); 
+		 Matcher matcher = pattern.matcher(html); 
+		 if (matcher.find()) { 
+			 title = matcher.group(1); 
+			 if (valifyName) {
+				 title = Parser.fileNameValify(title);
+			 }
+		 }
+		 return title; 
+	 }
+	 
+	/**
+	 * 文章分类剖析器
+	 * @param html 待剖析的html内容
+	 * @param valifyName 是否合法化分类名
+	 * @return 文章分类
+	 */
+	public static List<String> blogCategoriesParser(String html, boolean valifyName) {
+		List<String> categories = new ArrayList<String>();
+		Pattern pattern = Pattern.compile("\'blog_articles_fenlei\']);\">(.*?)</a>"); 
+		Matcher matcher = pattern.matcher(html); 
+		while(matcher.find()) {
+			String category = matcher.group(1);
+			if (valifyName) {
+				category = Parser.fileNameValify(category);
+			}
+			categories.add(category);
+		}
+		 return categories;
+	}
+	
+	/**
+	 * 文章剖析器。
+	 * @param html 待剖析的html内容
+	 * @return 文章内容
+	 */
+	public static String docParser(String html) {
+		StringBuilder sb = new StringBuilder(html);
+		int start;
+		int end;
+		// Remove toolbar
+		start = 0;
+		end = sb.indexOf("<div id=\"container\">");
+		sb.delete(start, end);
+		// Remove navigator
+		start = sb.indexOf("<div id=\"navigator\">");
+		end = sb.indexOf("<script type=\"text/javascript\">");
+		sb.delete(start, end);
+		// Remove ad
+		start = sb.indexOf("<div class=\"ad_class\">");
+		end = sb.indexOf("<div id=\"article_details\"");
+		sb.delete(start, end);
+		// Remove rest
+		start = sb.indexOf("<!-- Baidu Button BEGIN -->");
+		end = sb.length();
+		sb.delete(start, end);
+		return sb.toString();
+	}
+	
 	/**
 	 * 博客信息剖析器。
 	 * @param html 待剖析的html内容
@@ -57,7 +125,7 @@ public class Parser {
 	 * @param html 待剖析的html内容
 	 * @return 文章分类标题和链接
 	 */
-	public static List<SimpleEntry<String, String>> categoryParser(String html) {
+	public static List<SimpleEntry<String, String>> categoriresParser(String html) {
 		List<SimpleEntry<String, String>> list = new ArrayList<SimpleEntry<String, String>>();
 		String prefix = "http://blog.csdn.net";
 		Pattern pattern;
@@ -92,6 +160,7 @@ public class Parser {
 		return list;
 	}
 	
+	
 	/**
 	 * 图片剖析器。
 	 * @param html 待剖析的html内容
@@ -120,41 +189,6 @@ public class Parser {
 		return Integer.valueOf(category.substring(start, category.length() - 1));
 	}
 
-	/*
-	 * public static String titleParser(String html) { String title = null;
-	 * Pattern pattern = Pattern.compile("<title>(.*?) -"); Matcher matcher =
-	 * pattern.matcher(html); if (matcher.find()) { title = matcher.group(1); }
-	 * title = Parser.fileNameValify(title); return title; }
-	 */
-
-	/**
-	 * 文章剖析器。
-	 * @param html 待剖析的html内容
-	 * @return 文章内容
-	 */
-	public static String docParser(String html) {
-		StringBuilder sb = new StringBuilder(html);
-		int start;
-		int end;
-		// Remove toolbar
-		start = 0;
-		end = sb.indexOf("<div id=\"container\">");
-		sb.delete(start, end);
-		// Remove navigator
-		start = sb.indexOf("<div id=\"navigator\">");
-		end = sb.indexOf("<script type=\"text/javascript\">");
-		sb.delete(start, end);
-		// Remove ad
-		start = sb.indexOf("<div class=\"ad_class\">");
-		end = sb.indexOf("<div id=\"article_details\"");
-		sb.delete(start, end);
-		// Remove rest
-		start = sb.indexOf("<!-- Baidu Button BEGIN -->");
-		end = sb.length();
-		sb.delete(start, end);
-		return sb.toString();
-	}
-
 	/**
 	 * 图片地址本地化。将html中的图片地址变为本地的图片地址。
 	 * @param html 待剖析的html内容
@@ -167,7 +201,7 @@ public class Parser {
 		int end = 0;
 		int imgName = 1;
 		while (true) {
-			start = sb.indexOf("<img src=\"http:", start);
+			start = sb.indexOf("<img src=\"http", start);
 			if (start == -1) {
 				break;
 			}
@@ -208,6 +242,38 @@ public class Parser {
 		}
 		return filename;
 	}
+	
+	/**
+	 * 为博客信息构建索引
+	 * @param user 用户名
+	 * @param imgUrl 头像地址
+	 * @param blogInfo 博客信息
+	 * @return 博客信息索引
+	 */
+	public static String blogInfoToIndex(String user, String imgUrl, List<String> blogInfo) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<title>"  +user + "的 CSDN博客</title>\n");		
+		sb.append("<p><a href=\"" + "http://blog.csdn.net/"+ user
+				+ "\"><font size=14px, color=orange>"  + user
+				+ "</font></a></p>\n");
+		sb.append("<table><tr>\n");
+		sb.append("<td><img src=\"" + imgUrl + "\"" + "alt=\"头像\" align=\"left\"></td>\n");
+		sb.append("<td><table>\n");
+		sb.append("  <tr><td><table>\n");
+		sb.append("    <tr><td><font size=2px>" + "访问：" + blogInfo.get(0) + "</font></td></tr>\n");
+		sb.append("    <tr><td><font size=2px>" + "积分：" + blogInfo.get(1) + "</font></td></tr>\n");
+		sb.append("    <tr><td><font size=2px>" + "排名：" + blogInfo.get(2) + "</font></td></tr>\n");
+		sb.append("  </table></td></tr>\n");
+		sb.append("  <tr><td><table>\n");
+		sb.append("    <tr><td><font size=2px>" + "原创：" + blogInfo.get(3) + "</font></td></tr>\n");
+		sb.append("    <tr><td><font size=2px>" + "转载：" + blogInfo.get(4) + "</font></td></tr>\n");
+		sb.append("    <tr><td><font size=2px>" + "译文：" + blogInfo.get(5) + "</font></td></tr>\n");
+		sb.append("    <tr><td><font size=2px>" + "翻译：" + blogInfo.get(6) + "</font></td></tr>\n");
+		sb.append("  </table></td></tr>\n");
+		sb.append("</table></td>\n");
+		sb.append("</tr></table>\n");
+		return sb.toString();
+	}
 
 	/**
 	 * 为分类构建索引
@@ -217,13 +283,22 @@ public class Parser {
 	 */
 	public static String categoryToIndex(String category, String url) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<li><a href=\"" + url + "\" ");
+		sb.append("<li><a href=\"" +  "file:\\\\\\" + url + "\" ");
 		sb.append("title=\"" + category + "\">" + category);
 		sb.append("</a></li>\n");
 		sb.append("<ul style=\"list-style-type:none\">\n");
 		return sb.toString();
 	}
 
+	/**
+	 * 分类索引头
+	 * @param url 博客分类下载地址
+	 * @return 插入的首部
+	 */
+	public static String categoryOpenToIndex(String url) {
+		return "<p><a href=\"" + "file:\\\\\\" + url + "\">博客目录:</a></p>\n";
+	}
+	
 	/**
 	 * 分类索引末尾
 	 * @return 插入的结尾
@@ -240,38 +315,10 @@ public class Parser {
 	 */
 	public static String blogToIndex(String title, String url) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("    <li><a href=\"" + url + "\" ");
+		sb.append("    <li><a href=\"" + "file:\\\\\\" + url + "\" ");
 		sb.append("title=\"" + title + "\">" + title);
 		sb.append("</li</a>\n");
 		return sb.toString();
 	}
 
-	/**
-	 * 为博客信息构建索引
-	 * @param user 用户名
-	 * @param blogInfo 博客信息
-	 * @return 博客信息索引
-	 */
-	public static String blogInfoToIndex(String user, List<String> blogInfo) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("<title>" +user + "的 CSDN博客</title>\n");
-		sb.append("<p><a href=\"" + "http://blog.csdn.net/"+user
-				+ "\"><font size=14px, color=orange>"  +user
-				+ "</font></a></p>\n");
-		sb.append("<p><font size=2px>");
-		sb.append("访问：" + blogInfo.get(0)
-				+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-		sb.append("积分：" + blogInfo.get(1)
-				+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-		sb.append("排名：" + blogInfo.get(2) + "</font></p>\n");
-		sb.append("<p><font size=2px>");
-		sb.append("原创：" + blogInfo.get(3)
-				+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-		sb.append("转载：" + blogInfo.get(4)
-				+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-		sb.append("译文：" + blogInfo.get(5)
-				+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-		sb.append("评论" + blogInfo.get(6) + "</font></p>\n");
-		return sb.toString();
-	}
 }
